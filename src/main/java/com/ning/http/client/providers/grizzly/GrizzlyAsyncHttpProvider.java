@@ -2291,6 +2291,9 @@ public class GrizzlyAsyncHttpProvider implements AsyncHttpProvider {
             String host = ((proxy != null) ? proxy.getHost() : uri.getHost());
             int port = ((proxy != null) ? proxy.getPort() : uri.getPort());
             int cTimeout = provider.clientConfig.getConnectionTimeoutInMs();
+            if (request.getConnectTimeout() > 0) {
+                cTimeout = request.getConnectTimeout();
+            }
             FutureImpl<Connection> future = Futures.createSafeFuture();
             CompletionHandler<Connection> ch = Futures.toCompletionHandler(future,
                     createConnectionCompletionHandler(request, requestFuture, null));

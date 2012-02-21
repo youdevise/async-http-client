@@ -947,7 +947,11 @@ public class NettyAsyncHttpProvider extends SimpleChannelUpstreamHandler impleme
 
         ChannelFuture channelFuture;
         ClientBootstrap bootstrap = request.getUrl().startsWith(WEBSOCKET) ? webSocketBootstrap : (useSSl ? secureBootstrap : plainBootstrap);
-        bootstrap.setOption("connectTimeoutMillis", config.getConnectionTimeoutInMs());
+        int connectionTimeoutInMs = config.getConnectionTimeoutInMs();
+        if (request.getConnectTimeout() > 0) {
+            connectionTimeoutInMs = request.getConnectTimeout();
+        }
+        bootstrap.setOption("connectTimeoutMillis", connectionTimeoutInMs);
 
         // Do no enable this with win.
         if (System.getProperty("os.name").toLowerCase().indexOf("win") == -1) {
@@ -977,6 +981,9 @@ public class NettyAsyncHttpProvider extends SimpleChannelUpstreamHandler impleme
 
         if (directInvokation && !asyncConnect && request.getFile() == null) {
             int timeOut = config.getConnectionTimeoutInMs() > 0 ? config.getConnectionTimeoutInMs() : Integer.MAX_VALUE;
+            if (request.getConnectTimeout() > 0) {
+                timeOut = request.getConnectTimeout();
+            }
             if (!channelFuture.awaitUninterruptibly(timeOut, TimeUnit.MILLISECONDS)) {
                 if (acquiredConnection) {
                     freeConnections.release();

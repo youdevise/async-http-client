@@ -230,4 +230,5 @@ public interface Request {
 
     public boolean isUseRawUrl();
 
+    public int getConnectTimeout();
 }

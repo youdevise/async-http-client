@@ -66,6 +66,7 @@ public abstract class RequestBuilderBase<T extends RequestBuilderBase<T>> {
         private long rangeOffset = 0;
         public String charset;
         private boolean useRawUrl = false;
+        private int connectTimeout = 0;
 
         public RequestImpl(boolean useRawUrl) {
             this.useRawUrl = useRawUrl;
@@ -97,6 +98,7 @@ public abstract class RequestBuilderBase<T extends RequestBuilderBase<T>> {
                 this.rangeOffset = prototype.getRangeOffset();
                 this.charset = prototype.getBodyEncoding();
                 this.useRawUrl = prototype.isUseRawUrl();
+                this.connectTimeout = prototype.getConnectTimeout();
             }
         }
 
@@ -298,6 +300,10 @@ public abstract class RequestBuilderBase<T extends RequestBuilderBase<T>> {
 
         public boolean isUseRawUrl() {
             return useRawUrl;
+        }
+
+        public int getConnectTimeout() {
+            return connectTimeout;
         }
     }
 
