@@ -84,6 +84,7 @@ public class AsyncHttpClientConfig {
     protected HostnameVerifier hostnameVerifier;
     protected int ioThreadMultiplier;
     protected boolean strict302Handling;
+    protected int maxConnectionLifeTimeInMs;
 
     protected AsyncHttpClientConfig() {
     }
@@ -95,6 +96,7 @@ public class AsyncHttpClientConfig {
                                   int idleConnectionInPoolTimeoutInMs,
                                   int idleConnectionTimeoutInMs,
                                   int requestTimeoutInMs,
+                                  int connectionMaxLifeTimeInMs,
                                   boolean redirectEnabled,
                                   int maxDefaultRedirects,
                                   boolean compressionEnabled,
@@ -126,6 +128,7 @@ public class AsyncHttpClientConfig {
         this.idleConnectionInPoolTimeoutInMs = idleConnectionInPoolTimeoutInMs;
         this.idleConnectionTimeoutInMs = idleConnectionTimeoutInMs;
         this.requestTimeoutInMs = requestTimeoutInMs;
+        this.maxConnectionLifeTimeInMs = connectionMaxLifeTimeInMs;
         this.redirectEnabled = redirectEnabled;
         this.maxDefaultRedirects = maxDefaultRedirects;
         this.compressionEnabled = compressionEnabled;
@@ -477,6 +480,15 @@ public class AsyncHttpClientConfig {
     }
 
     /**
+     * Return the maximum time in millisecond an {@link com.ning.http.client.AsyncHttpClient} will keep connection in the pool, or -1 to keep connection while possible.
+     *
+     * @return the maximum time in millisecond an {@link com.ning.http.client.AsyncHttpClient} will keep connection in the pool, or -1 to keep connection while possible.
+     */
+    public int getMaxConnectionLifeTimeInMs() {
+        return maxConnectionLifeTimeInMs;
+    }
+
+    /**
      * Builder for an {@link AsyncHttpClient}
      */
     public static class Builder {
@@ -487,6 +499,7 @@ public class AsyncHttpClientConfig {
         private int defaultIdleConnectionInPoolTimeoutInMs = Integer.getInteger(ASYNC_CLIENT + "defaultIdleConnectionInPoolTimeoutInMS", 60 * 1000);
         private int defaultIdleConnectionTimeoutInMs = Integer.getInteger(ASYNC_CLIENT + "defaultIdleConnectionTimeoutInMS", 60 * 1000);
         private int defaultRequestTimeoutInMs = Integer.getInteger(ASYNC_CLIENT + "defaultRequestTimeoutInMS", 60 * 1000);
+        private int defaultMaxConnectionLifeTimeInMs = Integer.getInteger(ASYNC_CLIENT + "defaultMaxConnectionLifeTimeInMs", -1);
         private boolean redirectEnabled = Boolean.getBoolean(ASYNC_CLIENT + "defaultRedirectsEnabled");
         private int maxDefaultRedirects = Integer.getInteger(ASYNC_CLIENT + "defaultMaxRedirects", 5);
         private boolean compressionEnabled = Boolean.getBoolean(ASYNC_CLIENT + "compressionEnabled");
@@ -957,6 +970,17 @@ public class AsyncHttpClientConfig {
         }
 
         /**
+         * Set the maximum time in millisecond connection can be added to the pool for further reuse
+         *
+         * @param maxConnectionLifeTimeInMs the maximum time in millisecond connection can be added to the pool for further reuse
+         * @return a {@link Builder}
+         */
+        public Builder setMaxConnectionLifeTimeInMs(int maxConnectionLifeTimeInMs) {
+           this.defaultMaxConnectionLifeTimeInMs = maxConnectionLifeTimeInMs;
+           return this;
+        }
+
+        /**
          * Create a config builder with values taken from the given prototype configuration.
          *
          * @param prototype the configuration to use as a prototype.
@@ -969,6 +993,7 @@ public class AsyncHttpClientConfig {
             defaultIdleConnectionInPoolTimeoutInMs = prototype.getIdleConnectionInPoolTimeoutInMs();
             defaultIdleConnectionTimeoutInMs = prototype.getIdleConnectionTimeoutInMs();
             defaultMaxConnectionPerHost = prototype.getMaxConnectionPerHost();
+            defaultMaxConnectionLifeTimeInMs = prototype.getMaxConnectionLifeTimeInMs();
             maxDefaultRedirects = prototype.getMaxRedirects();
             defaultMaxTotalConnections = prototype.getMaxTotalConnections();
             proxyServer = prototype.getProxyServer();
@@ -1022,6 +1047,7 @@ public class AsyncHttpClientConfig {
                     defaultIdleConnectionInPoolTimeoutInMs,
                     defaultIdleConnectionTimeoutInMs,
                     defaultRequestTimeoutInMs,
+                    defaultMaxConnectionLifeTimeInMs,
                     redirectEnabled,
                     maxDefaultRedirects,
                     compressionEnabled,
